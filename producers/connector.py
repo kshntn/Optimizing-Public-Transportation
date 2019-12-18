@@ -53,10 +53,11 @@ def configure_connector():
                # TODO
                "topic.prefix": "chicago.cta.",
                # TODO
-               "poll.interval.ms": "10000",
+               "poll.interval.ms": "1000000",
            }
        }),
     )
+    print("hello")
 
     # Ensure a healthy response was given
     resp.raise_for_status()

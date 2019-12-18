@@ -1,7 +1,7 @@
 {
     "type": "record",
     "name": "weather.value",
-    "namespace": "chicago.cta.udacity",
+    "namespace": "chicago.cta",
     "fields": [
         {"name": "temperature", "type": "float"},
         {"name": "status", "type": "string"}

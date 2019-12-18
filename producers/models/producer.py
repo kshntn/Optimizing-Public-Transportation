@@ -50,12 +50,11 @@ class Producer:
        
         self.producer = AvroProducer({
             'bootstrap.servers': "PLAINTEXT://localhost:9092",
-            'schema.registry.url': 'http://localhost:8091'
-        })
+            'schema.registry.url': 'http://localhost:8091'},
+            default_key_schema=key_schema,
+            default_value_schema=value_schema
+        )
     
-    
-
-
     def create_topic(self):
         """Creates the producer topic if it does not already exist"""
         #
@@ -84,7 +83,7 @@ class Producer:
                 ]
             )
         
-        logger.info("topic creation kafka integration incomplete - skipping")
+#         logger.info("topic creation kafka integration incomplete - skipping")
 
     def time_millis(self):
         return int(round(time.time() * 1000))
@@ -96,7 +95,8 @@ class Producer:
         # TODO: Write cleanup code for the Producer here
         #
         #
-        self.producer.flush(timeout=60.0)
+        if self.producer is not None:
+            self.producer.flush()
 #         logger.info("producer close incomplete - skipping")
 
     def time_millis(self):
