@@ -20,7 +20,7 @@ class Producer:
         self,
         topic_name,
         key_schema,
-        value_schema=None,
+        value_schema,
         num_partitions=1,
         num_replicas=1,
     ):
@@ -38,7 +38,9 @@ class Producer:
         #
         #
         self.broker_properties = {
-            "broker.id": 0,
+            # TODO
+            # TODO
+            # TODO
         }
 
         # If the topic does not already exist, try to create it
@@ -47,14 +49,13 @@ class Producer:
             Producer.existing_topics.add(self.topic_name)
 
         # TODO: Configure the AvroProducer
-       
         self.producer = AvroProducer({
-            'bootstrap.servers': "PLAINTEXT://localhost:9092",
-            'schema.registry.url': 'http://localhost:8091'},
+            "bootstrap.servers": "PLAINTEXT://localhost:9092",
+            "schema.registry.url": "http://localhost:8081"},
             default_key_schema=key_schema,
             default_value_schema=value_schema
         )
-    
+
     def create_topic(self):
         """Creates the producer topic if it does not already exist"""
         #
@@ -63,7 +64,7 @@ class Producer:
         # the Kafka Broker.
         #
         #
-        client = AdminClient({'bootstrap.servers': "PLAINTEXT://localhost:9092"})
+        client = AdminClient({"bootstrap.servers": "PLAINTEXT://localhost:9092"})
         topic_meta = client.list_topics()
         
         if topic_meta.topics.get(self.topic_name) is None:
@@ -73,16 +74,15 @@ class Producer:
                         topic=self.topic_name,
                         num_partitions=self.num_partitions,
                         replication_factor=self.num_replicas,
-                        config={
-                            "cleanup.policy": "delete",
-                            "compression.type": "lz4",
-                            "delete.retention.ms": "2000",
-                            "file.delete.delay.ms": "2000",
-                        },
+#                         config={
+#                             "cleanup.policy": "compact",
+#                             "compression.type": "lz4",
+#                             "delete.retention.ms": "2000",
+#                             "file.delete.delay.ms": "2000",
+#                         },
                     )
                 ]
             )
-        
 #         logger.info("topic creation kafka integration incomplete - skipping")
 
     def time_millis(self):

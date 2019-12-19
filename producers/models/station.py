@@ -37,12 +37,12 @@ class Station(Producer):
         # replicas
         #
         #
-        topic_name = "chicago.station" # TODO: Come up with a better topic name
+        topic_name = "com.udacity.stations" # TODO: Come up with a better topic name
         super().__init__(
             topic_name,
             key_schema=Station.key_schema,
             value_schema=Station.value_schema, # TODO: Uncomment once schema is defined
-            num_partitions=1,
+            num_partitions=3,
             num_replicas=1,
         )
 
@@ -70,11 +70,11 @@ class Station(Producer):
                 "station_id": self.station_id,
                 "train_id": train.train_id,
                 "direction": direction,
-                "train_status": train,
-                "line": self.color,
+                "line": self.color.name,
+                "train_status": train.status.name,
                 "prev_station_id": prev_station_id,
                 "prev_direction": prev_direction
-           },
+           }
         )
 
     def __str__(self):

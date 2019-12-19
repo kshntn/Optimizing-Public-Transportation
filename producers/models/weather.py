@@ -37,11 +37,9 @@ class Weather(Producer):
         #
         #
         super().__init__(
-            "chicago.weather", # TODO: Come up with a better topic name
+            "com.udacity.weather", # TODO: Come up with a better topic name
             key_schema=Weather.key_schema,
             value_schema=Weather.value_schema,
-            num_partitions=1,
-            num_replicas=1,
         )
 
         self.status = Weather.status.sunny
@@ -112,6 +110,7 @@ class Weather(Producer):
            ),
         )
         resp.raise_for_status()
+
 
         logger.debug(
             "sent weather data to kafka, temp: %s, status: %s",

@@ -17,7 +17,9 @@ class Turnstile(Producer):
     #
     # TODO: Define this value schema in `schemas/turnstile_value.json, then uncomment the below
     #
-    value_schema = avro.load(f"{Path(__file__).parents[0]}/schemas/turnstile_value.json")
+    value_schema = avro.load(
+       f"{Path(__file__).parents[0]}/schemas/turnstile_value.json"
+    )
 
     def __init__(self, station):
         """Create the Turnstile"""
@@ -36,10 +38,10 @@ class Turnstile(Producer):
         #
         #
         super().__init__(
-            "chicago.turnstile", # TODO: Come up with a better topic name
+            "com.udacity.turnstile", # TODO: Come up with a better topic name
             key_schema=Turnstile.key_schema,
-            value_schema=Turnstile.value_schema,
-            num_partitions=1,
+            value_schema=Turnstile.value_schema, #TODO: Uncomment once schema is defined
+            num_partitions=3,
             num_replicas=1,
         )
         self.station = station
@@ -48,12 +50,11 @@ class Turnstile(Producer):
     def run(self, timestamp, time_step):
         """Simulates riders entering through the turnstile."""
         num_entries = self.turnstile_hardware.get_entries(timestamp, time_step)
-#         logger.info("turnstile kafka integration incomplete - skipping")
+        logger.info("turnstile kafka integration incomplete - skipping")
         #
         #
         # TODO: Complete this function by emitting a message to the turnstile topic for the number
         # of entries that were calculated
-        #
         #
         for i in range(num_entries):
             
@@ -64,5 +65,5 @@ class Turnstile(Producer):
                     "station_id":self.station.station_id,
                     "station_name":self.station.name,
                     "line":self.station.color
-                },
+                }
             )
