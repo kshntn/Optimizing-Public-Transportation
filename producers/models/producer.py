@@ -20,7 +20,7 @@ class Producer:
         self,
         topic_name,
         key_schema,
-        value_schema,
+        value_schema=None,
         num_partitions=1,
         num_replicas=1,
     ):
@@ -38,9 +38,8 @@ class Producer:
         #
         #
         self.broker_properties = {
-            # TODO
-            # TODO
-            # TODO
+        "schema.registry.url": "http://localhost:8081",
+        "bootstrap.servers": "PLAINTEXT://localhost:9092"
         }
 
         # If the topic does not already exist, try to create it
@@ -49,11 +48,12 @@ class Producer:
             Producer.existing_topics.add(self.topic_name)
 
         # TODO: Configure the AvroProducer
-        self.producer = AvroProducer({
+        self.producer = AvroProducer(
+            {
             "bootstrap.servers": "PLAINTEXT://localhost:9092",
             "schema.registry.url": "http://localhost:8081"},
             default_key_schema=key_schema,
-            default_value_schema=value_schema
+            default_value_schema=value_schema,
         )
 
     def create_topic(self):
@@ -67,22 +67,28 @@ class Producer:
         client = AdminClient({"bootstrap.servers": "PLAINTEXT://localhost:9092"})
         topic_meta = client.list_topics()
         
-        if topic_meta.topics.get(self.topic_name) is None:
-            futures = client.create_topics(
+        futures = client.create_topics(
                 [
                     NewTopic(
                         topic=self.topic_name,
                         num_partitions=self.num_partitions,
                         replication_factor=self.num_replicas,
-#                         config={
-#                             "cleanup.policy": "compact",
-#                             "compression.type": "lz4",
-#                             "delete.retention.ms": "2000",
-#                             "file.delete.delay.ms": "2000",
-#                         },
+                        config={
+                            "cleanup.policy": "delete",
+                            "compression.type": "lz4",
+                            "delete.retention.ms": "100",
+                            "file.delete.delay.ms": "100",
+                        },
                     )
                 ]
             )
+            
+        for topic, future in futures.items():
+            try:
+                future.result()
+                print("topic created")
+            except Exception as e:
+                print(f"failed to create topic {topic}: {e}")
 #         logger.info("topic creation kafka integration incomplete - skipping")
 
     def time_millis(self):

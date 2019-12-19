@@ -38,10 +38,10 @@ class Turnstile(Producer):
         #
         #
         super().__init__(
-            "com.udacity.turnstile", # TODO: Come up with a better topic name
+            "org.chicago.cta.station.turnstile.v1", # TODO: Come up with a better topic name
             key_schema=Turnstile.key_schema,
             value_schema=Turnstile.value_schema, #TODO: Uncomment once schema is defined
-            num_partitions=3,
+            num_partitions=1,
             num_replicas=1,
         )
         self.station = station
@@ -50,11 +50,12 @@ class Turnstile(Producer):
     def run(self, timestamp, time_step):
         """Simulates riders entering through the turnstile."""
         num_entries = self.turnstile_hardware.get_entries(timestamp, time_step)
-        logger.info("turnstile kafka integration incomplete - skipping")
+#         logger.info("turnstile kafka integration incomplete - skipping")
         #
         #
         # TODO: Complete this function by emitting a message to the turnstile topic for the number
         # of entries that were calculated
+        #
         #
         for i in range(num_entries):
             
@@ -64,6 +65,6 @@ class Turnstile(Producer):
                 value={
                     "station_id":self.station.station_id,
                     "station_name":self.station.name,
-                    "line":self.station.color
+                    "line":self.station.color.name
                 }
             )

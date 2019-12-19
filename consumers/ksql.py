@@ -27,7 +27,7 @@ CREATE TABLE turnstile (
     station_name VARCHAR,
     line VARCHAR
 ) WITH (
-    kafka_topic = 'chicago.turnstile',
+    kafka_topic = 'org.chicago.cta.station.turnstile.v1',
     value_format = 'avro',
     key = 'station_id'
 );
@@ -37,6 +37,7 @@ WITH (value_format = 'json') AS
     FROM turnstile
     GROUP BY station_id;
 """
+
 
 def execute_statement():
     """Executes the KSQL statement against the KSQL API"""

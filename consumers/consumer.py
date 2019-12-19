@@ -37,17 +37,19 @@ class KafkaConsumer:
         #
         #
         self.broker_properties = {
+            "group.id": "0",
             "bootstrap.servers": "PLAINTEXT://localhost:9092",
-            "broker.id": 0
+            "auto.offset.reset": "earliest"
         }
 
         # TODO: Create the Consumer, using the appropriate type.
         if is_avro is True:
             self.broker_properties["schema.registry.url"] = "http://localhost:8081"
-            self.consumer = AvroConsumer({"bootstrap.servers": "PLAINTEXT://localhost:9092", "group.id": "0"})
+            self.consumer = AvroConsumer(self.broker_properties)
         else:
-            self.consumer = Consumer({"bootstrap.servers": "PLAINTEXT://localhost:9092", "group.id": "0"})
+            self.consumer = Consumer(self.broker_properties)
             pass
+
 
         #
         #
@@ -55,21 +57,17 @@ class KafkaConsumer:
         # how the `on_assign` callback should be invoked.
         #
         #
-        self.consumer.subscribe([self.topic_name_pattern])
+        self.consumer.subscribe([self.topic_name_pattern], on_assign=self.on_assign)
 
     def on_assign(self, consumer, partitions):
         """Callback for when topic assignment takes place"""
         # TODO: If the topic is configured to use `offset_earliest` set the partition offset to
         # the beginning or earliest
-#         logger.info("on_assign is incomplete - skipping")
+        logger.info("on_assign completed")
         for partition in partitions:
-            if self.offset_earliest:
+            if self.offset_earliest is True:
                 partition.offset = confluent_kafka.OFFSET_BEGINNING
-            #
-            #
-            # TODO
-            #
-            #
+#             consumer.seek(partition)
 
         logger.info("partitions assigned for %s", self.topic_name_pattern)
         consumer.assign(partitions)
@@ -91,25 +89,19 @@ class KafkaConsumer:
         # is retrieved.
         #
         #
-        message = self.consumer.poll(self.consume_timeout)
-        if message is None:
+        message = self.consumer.poll(1.0)
+        if message is 0:
+            print("no message received")
             return 0
         elif message.error() is not None:
+            print(f"message error {message.error()}")
             return 0
         else:
             self.message_handler(message)
             return 1
 
-#         logger.info("_consume is incomplete - skipping")
-#         return 0
-
-
 
     def close(self):
         """Cleans up any open kafka consumers"""
-        #
-        #
-        # TODO: Cleanup the kafka consumer
-        #
-        #
+        logger.debug("closing consumer")
         self.consumer.close()

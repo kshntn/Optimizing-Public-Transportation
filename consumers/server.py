@@ -18,7 +18,7 @@ import topic_check
 
 
 logger = logging.getLogger(__name__)
-WEB_SERVER_PORT = 8889
+
 
 class MainHandler(tornado.web.RequestHandler):
     """Defines a web request handler class"""
@@ -46,8 +46,7 @@ def run_server():
             "Ensure that the KSQL Command has run successfully before running the web server!"
         )
         exit(1)
-
-    if topic_check.topic_pattern_match("stations.table") is False:
+    if topic_check.topic_exists("org.chicago.cta.stations.table.v1") is False:
         logger.fatal(
             "Ensure that Faust Streaming is running successfully before running the web server!"
         )
@@ -59,23 +58,23 @@ def run_server():
     application = tornado.web.Application(
         [(r"/", MainHandler, {"weather": weather_model, "lines": lines})]
     )
-    application.listen(WEB_SERVER_PORT)
+#     application.listen(8889)
 
     # Build kafka consumers
     consumers = [
         KafkaConsumer(
-            "(\w*|\.)*weather(.(\w*|\.))*",
+            "org.chicago.cta.weather.v1",
             weather_model.process_message,
             offset_earliest=True,
         ),
         KafkaConsumer(
-            "(\w*|\.)*stations.table(.(\w*|\.))",
+            "org.chicago.cta.stations.table.v1",
             lines.process_message,
             offset_earliest=True,
             is_avro=False,
         ),
         KafkaConsumer(
-            "(\w*|\.)*station.arrivals.(.(\w*|\.))*",
+            "^org.chicago.cta.station.arrivals.",
             lines.process_message,
             offset_earliest=True,
         ),
@@ -89,7 +88,7 @@ def run_server():
 
     try:
         logger.info(
-            f"Open a web browser to http://localhost:{WEB_SERVER_PORT} to see the Transit Status Page"
+            "Open a web browser to http://localhost:8888 to see the Transit Status Page"
         )
         for consumer in consumers:
             tornado.ioloop.IOLoop.current().spawn_callback(consumer.consume)
