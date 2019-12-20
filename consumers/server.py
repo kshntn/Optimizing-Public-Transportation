@@ -51,14 +51,14 @@ def run_server():
             "Ensure that Faust Streaming is running successfully before running the web server!"
         )
         exit(1)
-
+    
     weather_model = Weather()
     lines = Lines()
 
     application = tornado.web.Application(
         [(r"/", MainHandler, {"weather": weather_model, "lines": lines})]
     )
-#     application.listen(8889)
+    application.listen(8889)
 
     # Build kafka consumers
     consumers = [

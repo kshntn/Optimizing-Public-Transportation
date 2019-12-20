@@ -231,4 +231,8 @@ Once the simulation is running, you may hit `Ctrl+C` at any time to exit.
 5. `python server.py`
 
 Once the server is running, you may hit `Ctrl+C` at any time to exit.
-# Optimizing-Public-Transportation
+
+
+You can view the 230 stations defined in Postgres using: kafka-console-consumer --bootstrap-server localhost:9092 --topic "org.chicago.stations" --from-beginning to get the following output.
+![stations](https://user-images.githubusercontent.com/23194592/71279992-1b5bab80-2380-11ea-8290-143e8ae75307.png)
+
